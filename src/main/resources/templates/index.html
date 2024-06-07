@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <header class="header_wrapper">
+        <div class="header_main_header">
+            <div class="link_wrapper">
+                <span class="city"><img th:src="@{images/location.svg}"/> Алматы</span>
+                <span class="header_phone"><img th:src="@{images/phone.svg}"> +7 (777) 777 77 77</span>
+                <span class="header_mobile"><img th:src="@{images/mobile.svg}"> +7 777 777 77 77</span>
+            </div>
+
+        </div>
+        <div class="categories_wrapper">
+            <div class="second_wrapper">
+                <div class="all" @mouseover="upHere = true" @mouseleave="upHere = false" >
+                    <img th:src="@{images/menu.svg}">
+                    <span>Все категории</span>
+                    <img th:src="@{images/chevron-down.svg}" class="down">
+                    <div class="all_categories" v-show="upHere">
+                        <div th:each="category : ${categories}" class="category_item">
+                            <div class="category_item_second">
+                                <a th:href="@{'/category/' + ${category.id}}" th:text="${category.name}"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="categories">
+                    <div class="one_category" >
+                        <div class="category_item_second" th:each="category : ${categories}">
+                            <a th:href="@{'/category/' + ${category.id}}" th:text="${category.name}"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="cart" @click="Modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
+                        <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                    </svg>
+                    <div class="products_number">
+                        1
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="wrapper_with_header">
+        <div class="main_wrapper">
+            <img th:src="@{images/main_block.png}" class="main_block">
+            <div class="four_wrapper">
+                <div class="four_block_item" style="background-color: #4A75CF; color: white">
+                    <span>Доставка по регионам</span>
+                </div>
+                <div class="four_block_item" style="background-color: #E8E9ED; color: #5D5D64">
+                    <span>Оптовые ценны</span>
+                </div>
+                <div class="four_block_item" style="background-color: #D7E9F7; color: #5D5D64">
+                    <span>Гарантия качества</span>
+                </div>
+                <div class="four_block_item" style="background-color: #FFC626; color: white">
+                    <span>Консультация специалистов</span>
+                </div>
+            </div>
+            <div class="partners_wrapper">
+                <div class="partner_item">
+                    <img th:src="@{images/canon.svg}" >
+                </div>
+                <div class="partner_item">
+                    <img th:src="@{images/microsoft.svg}">
+                </div>
+                <div class="partner_item">
+                    <img th:src="@{images/hp.svg}">
+                </div>
+                <div class="partner_item">
+                    <img th:src="@{images/samsung.svg}">
+                </div>
+                <div class="partner_item">
+                    <img th:src="@{images/lenovo.svg}">
+                </div>
+                <div class="partner_item">
+                    <img th:src="@{images/oppo.svg}">
+                </div>
+                <div class="partner_item">
+                    <img th:src="@{images/lg.svg}">
+                </div>
+                <div class="partner_item">
+                    <img th:src="@{images/epson.svg}">
+                </div>
+                <div class="partner_item">
+                    <img th:src="@{images/huawei.svg}">
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz@8..144&display=swap');
+
+    body{
+        margin:0;
+        overflow-x: hidden;
+    }
+    .category_item_second{
+        display: flex;
+        align-items: center;
+    }
+    .category_item_second a{
+        margin-left: 1.5vw;
+        text-decoration: none;
+        color: black;
+        color: #4A75CF;
+        font-size: 0.9em;
+    }
+
+    .category_item_second a:active{
+        text-decoration: none;
+        color: black;
+        color: #4A75CF;
+    }
+    .header_wrapper {
+        width: 100vw;
+        height: 95px;
+        font-family: 'Roboto Flex', sans-serif;
+        z-index: 10000;
+    }
+
+    .header_wrapper .header_main_header {
+        width: 100vw;
+        height: 35px;
+        border-bottom: 1px solid grey;
+        background-color: #2B51A1;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper {
+        width: 1180px;
+        height: 35px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: white;
+        font-size: 0.8em;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper .city {
+        font-size: 0.8em;
+        width: 8vw;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper .header_mobile {
+        font-size: 0.8em;
+        margin-left: 2vw;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper .header_phone {
+        font-size: 0.8em;
+        margin-left: 64%;
+    }
+
+    .header_wrapper .categories_wrapper {
+        width: 100vw;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid grey;
+        background-color: #FFFFFF;
+    }
+
+    .header_wrapper .categories_wrapper .cart {
+        width: 2.8vw;
+        height: 5vh;
+        margin-left: 8vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #cacaca;
+        border-radius: 50%;
+        position: relative;
+        z-index: 1;
+        cursor: pointer;
+    }
+
+    .header_wrapper .categories_wrapper .cart .products_number {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        text-align: center;
+        top: 60%;
+        left: -18%;
+        font-size: 12px;
+        color: white;
+        background-color: #2B51A1;
+        border-radius: 50%;
+        padding: 0.5vh;
+        z-index: 100;
+    }
+
+    .header_wrapper .categories_wrapper .categories {
+        width: 770px;
+        height: 100%;
+        display: flex;
+        color: #4A75CF;
+    }
+
+    .header_wrapper .categories_wrapper .categories .one_category {
+        padding-left: 2vw;
+        padding-right: 2vw;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper {
+        width: 1180px;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all {
+        color: #4A75CF;
+        cursor: pointer;
+        border-right: 1px solid #E6E4E4;
+        height: 100%;
+        width: 170px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all span {
+        font-size: 0.9em;
+        margin-left: 0.5vw;
+        padding-right: 0.4vw;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all .all_categories {
+        position: absolute;
+        left: 0%;
+        top: 100%;
+        width: 170px;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        border-bottom: 1px solid black;
+        background-color: #FFFFFF;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all .all_categories .category_item {
+        height: 5vh !important;
+        border-top: 1px solid gray !important;
+        display: flex;
+        align-items: center;
+    }
+    .main_wrapper {
+        width: 100vw;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        background-color: #FCFCFC;
+    }
+
+    .main_wrapper .main_block {
+        margin-top: 4vh;
+    }
+
+    .main_wrapper .four_wrapper {
+        margin-top: 1vh;
+        width: 1180px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .main_wrapper .four_wrapper .four_block_item {
+        height: 180px;
+        width: 24%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+        font-weight: 700;
+    }
+
+    .main_wrapper .four_wrapper .four_block_item span {
+        width: 80%;
+        text-align: center;
+    }
+
+    .main_wrapper .partners_wrapper {
+        width: 1180px;
+        height: 15vh;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 1vh;
+    }
+
+    .main_wrapper .partners_wrapper .partner_item {
+        width: 10%;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #E6E4E4;
+        background-color: #FFFFFF;
+        border-radius: 10px;
+    }
+
+</style>
+</html>
