@@ -2,8 +2,13 @@ package com.example.marketdiplomaspring.Product;
 
 public class ProductService {
 
-    public Iterable<Product> getCategories(ProductRepository productRepository) {
+    public Iterable<Product> getProducts(ProductRepository productRepository) {
         return productRepository.findAll();
+    }
+
+    public Object getProductById(ProductRepository productRepository, Long id) {
+
+        return productRepository.findById(id);
     }
 
     public Product addProduct(ProductRepository productRepository, Product product) {

@@ -13,11 +13,19 @@ public class ProductController {
         this.productRepository = productRepository;
     }
     @GetMapping("")
-    public Iterable<Product> getCategories()
+    public Iterable<Product> getProduct()
     {
         ProductService productService = new ProductService();
 
-        return productService.getCategories(this.productRepository);
+        return productService.getProducts(this.productRepository);
+    }
+
+    @GetMapping("/{id}")
+    public Object getProductById(@PathVariable Long id)
+    {
+        ProductService productService = new ProductService();
+
+        return productService.getProductById(this.productRepository, id);
     }
 
     @PostMapping("")

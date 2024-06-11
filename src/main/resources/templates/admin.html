@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body onload="isAdminChecker()">
+<div class="admin_wrapper">
+    <form class="login" id="login">
+        <legend class="text-center">Login</legend>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()" type="button">Login</button>
+    </form>
+    <script>
+
+        function isAdminChecker(){
+            if(window.localStorage.getItem("is_admin")){
+
+                document.getElementById("login").style.display = "none";
+                document.getElementById("admin").style.display = "block";
+            }
+        }
+
+
+        function login(){
+
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+
+            let login_block = document.getElementById("login");
+
+            let admin_block = document.getElementById("admin");
+
+            if(username == "admin" && password == "admin"){
+                login_block.style.display = "none";
+                admin_block.style.display = "block";
+                window.localStorage.setItem("is_admin", true);
+            }else{
+                alert("Incorrect login or password!");
+            }
+        }
+
+    </script>
+    <div class="d-flex flex-column align-items-center w-100 admin-panel-wrapper" id="admin">
+        <div class="wrapper">
+            <div class="d-flex flex-column admin-item">
+                <h2 class="text-left margins">Заявки</h2>
+                <div
+                        th:each="order : ${orders}"
+                        class="margins bot-line">
+                    <span th:text="@{'Имя: ' + ${order.name}}"></span><br>
+                    <span th:text="@{'Телефон: ' + ${order.phone}}"></span><br>
+                    <span th:text="@{'Адрес: ' + ${order.address}}"></span><br>
+                    <div class="req_product">
+                <span th:each="order_product : ${order_products}">
+                    <span th:if="${order_product.order_id == order.id}">
+                        <span th:each="product : ${products}">
+                            <span th:if="${product.id == order_product.product_id}" th:text="@{'Название: '+ ${product.name} + ', Ценна: ' + ${product.price} }">
+
+                            </span>
+                        </span>
+                    </span>
+                </span>
+                    </div>
+                    <span th:text="@{'Дата отправки: ' + ${order.created_at}}">
+                </span>
+                </div>
+            </div>
+            <div class="d-flex flex-column admin-item mt-3">
+                <h2 class="text-left margins">Категории</h2>
+                <form class="d-flex flex-row margins">
+                    <input type="text" placeholder="Название" id="category_name">
+                    <button class="button-margin" onclick="createCategory()">Создать</button>
+                </form>
+                <div th:each="category : ${categories}"
+                        class="margins">
+                    <span class="item-text" th:text="@{${category.id} + '. ' + ${category.name}}"></span>
+                    <button class="button-margin" th:onclick="deleteCategory([[${category.id}]])">Удалить</button>
+                </div>
+                <script>
+                    async function createCategory(){
+                        name = document.getElementById("category_name").value
+                        let is_create = name != "" ? true : false
+
+                        if(!is_create){
+                            alert("Not all required data have!");
+                        }else {
+                            const response = await fetch("/api/category", {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    name: name
+                                }),
+                                headers: {
+                                    "Content-type": "application/json; charset=UTF-8",
+                                },
+                            }).then((response) => {
+                                alert("Success create category")
+                                window.location.reload(true);
+                            })
+                                .catch(function (error) {
+                                        alert("Exception on create!!")
+                                    }
+                                )
+                        }
+                    }
+                    async function deleteCategory(id){
+                        const response = await fetch("/api/category/" + id, {
+                            method: "DELETE",
+                            headers: {
+                                "Content-type": "application/json; charset=UTF-8",
+                            },
+                        }).then((response)=>{
+                            alert("Success delete category")
+                            window.location.reload(true);
+                        })
+                            .catch(function (error) {
+                                    alert("Exception on delete!!")
+                                }
+                            )
+                    }
+                </script>
+            </div>
+            <div class="d-flex flex-column admin-item mt-3">
+                <h2 class="text-left margins">Продукты</h2>
+                <form class="margins">
+                    <input class="input-margin" type="text" placeholder="Название" id="product_name" required>
+                    <input class="input-margin" type="text" placeholder="Цена" id="product_price" required>
+                    <input class="input-margin" type="text" placeholder="Описание" id="description" required>
+                    <input class="input-margin" type="text" placeholder="Ссылка на картинку" id="image_url" required>
+                    <select class="input-margin" type="text" placeholder="Название категории" id="product_category" required>
+                        <option th:each="category : ${categories}"
+                                th:value="${category.id}"
+                                th:text="${category.name}"
+                        >
+                        </option>
+                    </select>
+                    <button class="input-margin" onclick="createProduct()">Создать</button>
+                </form>
+                <div
+                        th:each="product : ${products}"
+                        class="margins">
+                    <span class="item-text" th:text="@{${product.id} + '. ' + ${product.name} + ' ' + ${product.price} + ' тг.'}"></span>
+                    <button class="button-margin" th:onclick="deleteProduct([[${product.id}]])">Удалить</button>
+                </div>
+                <script>
+                    async function createProduct(){
+
+
+                        name = document.getElementById("product_name").value
+                        price = document.getElementById("product_price").value
+                        description = document.getElementById("description").value
+                        image_url = document.getElementById("image_url").value
+                        product_category = document.getElementById("product_category").value
+
+                        let is_create = name != "" && price != "" && description != "" && image_url != "" && product_category != "" ? true : false
+
+                        if(!is_create){
+                            alert("Not all required data have!");
+                        }else{
+                            const response = await fetch("/api/product", {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    "name" : name,
+                                    "price" : price,
+                                    "description" : description,
+                                    "image_url" : image_url,
+                                    "category_id" : product_category
+                                }),
+                                headers: {
+                                    "Content-type": "application/json; charset=UTF-8",
+                                },
+                            }).then((response)=>{
+                                alert("Success create product")
+                                window.location.reload(true);
+                            })
+                                .catch(function (error) {
+                                        alert("Exception on create!!")
+                                    }
+                                )
+                        }
+
+
+
+                    }
+
+                    async function deleteProduct(id){
+                        const response = await fetch("/api/product/" + id, {
+                            method: "DELETE",
+                            headers: {
+                                "Content-type": "application/json; charset=UTF-8",
+                            },
+                        }).then((response)=>{
+                            alert("Success delete product");
+                            window.location.reload(true);
+                        })
+                            .catch(function (error) {
+                                    alert("Exception on delete!!")
+                                }
+                            )
+                    }
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<style>
+    body{
+        margin:0;
+        overflow-x: hidden;
+    }
+    .admin-panel-wrapper{
+        display: none;
+    }
+    .button-margin {
+        margin-left: 1.5vw;
+    }
+    .input-margin {
+        margin-top: 2vh;
+        margin-left: 1vw;
+    }
+    .wrapper {
+        margin-top: 5vh;
+        margin-left: 10vw;
+        margin-bottom: 5vh;
+    }
+    .bot-line {
+        border-bottom: 1px solid gray;
+        width: 80%;
+    }
+    .margins {
+        margin-left: 2vw;
+        margin-top: 2vh;
+    }
+    .admin-item {
+        margin-top: 3vh;
+        border: 1px solid gray;
+        border-radius: 20px;
+        width: 60%;
+        padding-bottom: 2vh;
+    }
+    .item-text {
+        font-size: 4vh;
+        margin-top: 2vh;
+        border-bottom: 1px solid gray;
+    }
+    .admin_wrapper {
+        width: 100vw;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .admin_wrapper .create_category {
+        width: 17% !important;
+    }
+    .admin_wrapper .create_product {
+        width: 20% !important;
+        height: 90vh;
+    }
+    .admin_wrapper .delete_product {
+        width: 14% !important;
+    }
+    .admin_wrapper .delete_product legend {
+        font-size: 1.2em;
+        padding-bottom: 2vh;
+    }
+    .admin_wrapper .login {
+        border-radius: 10px;
+        margin-top: 25vh;
+        display: block;
+        width: 23%;
+        height: 45vh;
+        background-color: gray;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+    .admin_wrapper .login legend {
+        padding-bottom: 4vh;
+        font-size: 2em;
+    }
+    .admin_wrapper .login input {
+        margin-bottom: 2vh;
+    }
+    .admin_wrapper .template {
+        width: 90%;
+        height: 100vh;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+    }
+    .admin_wrapper .template #admin_modal {
+        visibility: hidden;
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .admin_wrapper .template #admin_modal .requests {
+        width: 80%;
+        height: 90%;
+        background-color: #cacaca;
+        overflow-y: auto;
+    }
+    .admin_wrapper .template #admin_modal .requests .request_item {
+        width: 100%;
+        height: 5vh;
+        margin-top: 2vh;
+        border-bottom: 1px solid black;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-around;
+    }
+    .admin_wrapper .template #admin_modal .requests .request_item .req_product {
+        width: 50%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        overflow-y: auto;
+        overflow-x: hidden;
+        height: 100%;
+    }
+    .admin_wrapper .template #admin_modal .requests .request_item .req_product span {
+        width: 100%;
+    }
+    .admin_wrapper .template #admin_modal a {
+        cursor: pointer;
+        color: red;
+        text-decoration: underline;
+        font-size: 2em;
+        left: 2%;
+        top: 3%;
+        position: absolute;
+    }
+
+</style>
+</html>

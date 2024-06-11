@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart</title>
+</head>
+<body>
+<header class="header_wrapper">
+    <div class="header_main_header">
+        <div class="link_wrapper">
+            <span class="city"><img th:src="@{images/location.svg}"/> Алматы</span>
+            <span class="header_phone"><img th:src="@{images/phone.svg}"> +7 (777) 777 77 77</span>
+            <span class="header_mobile"><img th:src="@{images/mobile.svg}"> +7 777 777 77 77</span>
+        </div>
+
+    </div>
+    <div class="categories_wrapper">
+        <div class="second_wrapper">
+            <div class="all" id="all_categories" >
+                <img th:src="@{images/menu.svg}">
+                <span>Все категории</span>
+                <img th:src="@{images/chevron-down.svg}" class="down">
+                <div class="all_categories" id="all_categories_items">
+                    <div th:each="category : ${categories}" class="category_item">
+                        <div class="category_item_second">
+                            <a th:href="@{'/category/' + ${category.id}}" th:text="${category.name}"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="categories">
+                <div class="one_category" >
+                    <div class="category_item_second" th:each="category : ${categories}">
+                        <a th:href="@{'/category/' + ${category.id}}" th:text="${category.name}"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="cart" id="cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
+                    <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                </svg>
+                <div class="products_number">
+                    <script>
+                        document.getElementById("cart").addEventListener("click", (e)=>{
+                            window.location.replace("/cart");
+                        })
+                        if(JSON.parse(localStorage.getItem("cart")) != null){
+                            document.write(JSON.parse(localStorage.getItem("cart")).length);
+                        }else {
+                            document.write("0")
+                        }
+
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="modal_main_wrapper">
+    <div class="path">
+        <a href="/">Главная</a> > <span>Оформление заказов</span>
+        <h2>Оформление заказов</h2>
+    </div>
+    <div class="total_item_wrapper">
+        <div class="modal_wrapper">
+            <h1><span>Товары в корзине</span></h1>
+            <div class="c_item_wrapper" id="wrapper">
+                <script>
+                    cart_items = JSON.parse(localStorage.getItem("cart"));
+
+                    cart_items.forEach(function (item, i) {
+                        let div = document.createElement('div');
+                        div.setAttribute('class', 'product_item');
+                        div.innerHTML = `
+                            <img src="${item.image_url}">
+                            <div class="p_block">
+                                <span class="p_name">${item.name}</span>
+                                <ul>
+                                    <li>${item.description}</li>
+                                </ul>
+                                <span class="delete_object" onclick="removeObject(${i})"> Удалить </span>
+                            </div>
+                            <span>${item.price} ₸</span>
+                        `;
+                        document.getElementById('wrapper').appendChild(div);
+
+                    });
+                </script>
+            </div>
+        </div>
+        <div class="total">
+            <div class="total_num">Итого
+                <script>
+                    cart_items = JSON.parse(localStorage.getItem("cart"));
+                    if(cart_items!= null){
+                        document.write(cart_items.length);
+                    }else{
+                        document.write("0");
+                    }
+
+                </script>
+                товара на сумму</div>
+            <div class="total_sum">
+                <script>
+                    cart_items = JSON.parse(localStorage.getItem("cart"));
+                    products_cost = 0;
+                    if(cart_items!= null){
+                        cart_items.forEach((element) => {
+                            products_cost+= parseInt(element.price);
+                        });
+                    }
+                    document.write(products_cost);
+                </script> ₸</div>
+            <button onclick="takeOrder()">Оформить заказ</button>
+        </div>
+    </div>
+
+    <h2>Покупатель</h2>
+    <form style="height: 12vh">
+        <div class="input_block"><h3>ФИО</h3><input type="text" placeholder="Иванов Иван Иванович" required id="buy_name"></div>
+        <div class="input_block"><h3>Мобильный телефон</h3><input type="text" placeholder="+77077777777" min="11" max="12" required id="phone"></div>
+    </form>
+    <h2>Адрес доставки</h2>
+    <form style="height: 30vh; margin-bottom: 5vh;">
+        <div class="input_block"><h3>Область</h3><select id="area">
+            <option value="Алматинская область">Алматинская область</option>
+        </select></div>
+        <div class="input_block"><h3>Город / район</h3><select id="city">
+            <option value="Алматы">Алматы</option>
+        </select></div>
+        <div class="input_block"><h3>Адрес</h3><input type="text" placeholder="Ваш адрес"  required id="address"></div>
+        <div class="input_block"><h3>Комментарии</h3><textarea id="comments"></textarea></div>
+    </form>
+</div>
+<script>
+    let all_categories_block = document.getElementById("all_categories")
+    all_categories_block.addEventListener("mouseover", (e) => {
+        document.getElementById("all_categories_items").style.visibility = "visible"
+    })
+
+    all_categories_block.addEventListener("mouseleave", (e) => {
+        document.getElementById("all_categories_items").style.visibility = "hidden"
+    })
+
+    function removeObject(id) {
+        let cartItems = JSON.parse(localStorage.getItem("cart"));
+        localStorage.removeItem("cart");
+        cartItems.splice(id, 1);
+        localStorage.setItem("cart", JSON.stringify(cartItems));
+        cart_items = JSON.parse(localStorage.getItem("cart"));
+        window.location.reload(true);
+    }
+    
+    async function takeOrder() {
+        let cartItems = JSON.parse(localStorage.getItem("cart"));
+        let products_request = [];
+
+        products_cost = 0;
+        if(cart_items.length != 0 && cart_items != null){
+            cart_items.forEach((element) => {
+                products_request.push(element.id);
+                products_cost+= parseInt(element.price);
+            })
+            let order_id = 0;
+            const response = await fetch("/api/order", {
+                method: "POST",
+                body: JSON.stringify({
+                    name: document.getElementById("buy_name").value,
+                    address: document.getElementById("area").value + ', ' + document.getElementById("city").value + ', ' + document.getElementById("address").value,
+                    phone: document.getElementById("phone").value,
+                    comments: document.getElementById("comments").value,
+                    order_price: products_cost,
+                }),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                },
+            }).catch(function (error) {
+                    localStorage.removeItem("cart");
+                    window.location.reload(true);
+                }
+            )
+            let order = await response.json()
+            products_request.forEach((item) => {
+                fetch("/api/order/product", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        order_id : order.id,
+                        product_id : item
+                    }),
+                    headers: {
+                        "Content-type": "application/json; charset=UTF-8",
+                    },
+                }).catch(function (error) {
+                        localStorage.removeItem("cart");
+                        window.location.reload(true);
+                    }
+                )
+            })
+            localStorage.removeItem("cart");
+            window.location.reload(true);
+        }else{
+            alert("У вас нету товаров");
+        }
+    }
+</script>
+</body>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz@8..144&display=swap');
+
+    body{
+        margin:0;
+        overflow-x: hidden;
+    }
+    .category_item_second{
+        display: flex;
+        align-items: center;
+    }
+    .category_item_second a{
+        margin-left: 1.5vw;
+        text-decoration: none;
+        color: black;
+        color: #4A75CF;
+        font-size: 0.9em;
+    }
+
+    .category_item_second a:active{
+        text-decoration: none;
+        color: black;
+        color: #4A75CF;
+    }
+    .header_wrapper {
+        width: 100vw;
+        height: 95px;
+        font-family: 'Roboto Flex', sans-serif;
+        z-index: 10000;
+    }
+
+    .header_wrapper .header_main_header {
+        width: 100vw;
+        height: 35px;
+        border-bottom: 1px solid grey;
+        background-color: #2B51A1;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper {
+        width: 1180px;
+        height: 35px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: white;
+        font-size: 0.8em;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper .city {
+        font-size: 0.8em;
+        width: 8vw;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper .header_mobile {
+        font-size: 0.8em;
+        margin-left: 2vw;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper .header_phone {
+        font-size: 0.8em;
+        margin-left: 64%;
+    }
+
+    .header_wrapper .categories_wrapper {
+        width: 100vw;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid grey;
+        background-color: #FFFFFF;
+    }
+
+    .header_wrapper .categories_wrapper .cart {
+        width: 2.8vw;
+        height: 5vh;
+        margin-left: 8vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #cacaca;
+        border-radius: 50%;
+        position: relative;
+        z-index: 1;
+        cursor: pointer;
+    }
+
+    .header_wrapper .categories_wrapper .cart .products_number {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        text-align: center;
+        top: 60%;
+        left: -18%;
+        font-size: 12px;
+        color: white;
+        background-color: #2B51A1;
+        border-radius: 50%;
+        padding: 0.5vh;
+        z-index: 100;
+    }
+
+    .header_wrapper .categories_wrapper .categories {
+        width: 770px;
+        height: 100%;
+        display: flex;
+        color: #4A75CF;
+    }
+
+    .header_wrapper .categories_wrapper .categories .one_category {
+        padding-left: 2vw;
+        padding-right: 2vw;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper {
+        width: 1180px;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all {
+        color: #4A75CF;
+        cursor: pointer;
+        border-right: 1px solid #E6E4E4;
+        height: 100%;
+        width: 170px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all span {
+        font-size: 0.9em;
+        margin-left: 0.5vw;
+        padding-right: 0.4vw;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all .all_categories {
+        visibility: hidden;
+        position: absolute;
+        left: 0%;
+        top: 100%;
+        width: 170px;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        border-bottom: 1px solid black;
+        background-color: #FFFFFF;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all .all_categories .category_item {
+        height: 5vh !important;
+        border-top: 1px solid gray !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .product_item{
+        width: 100%; height: 120px; background-color: #FFFFFF; border-bottom: 1px solid #E6E4E4; display: flex; align-items: center;
+    }
+    .modal_main_wrapper {
+        width: 100vw;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .modal_main_wrapper .path {
+        width: 1180px;
+        margin-top: 2vh;
+    }
+
+    .modal_main_wrapper .path a {
+        padding-right: 1vw;
+        text-decoration: none;
+        color: black;
+    }
+
+    .modal_main_wrapper .path a:hover {
+        text-decoration: underline;
+    }
+
+    .modal_main_wrapper .path a:active {
+        color: black;
+    }
+
+    .modal_main_wrapper .path span {
+        padding-left: 1vw;
+    }
+
+    .modal_main_wrapper .path h2 {
+        margin-top: 1vh;
+        padding-bottom: 2vh;
+    }
+
+    .modal_main_wrapper .total_item_wrapper {
+        width: 1180px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .total {
+        height: 27vh;
+        width: 16vw;
+        border: 1px solid #E6E4E4;
+        background-color: #FFFFFF;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .total .total_num {
+        font-size: 1.2em;
+        margin-top: 2vh;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .total .total_sum {
+        margin-top: 1vh;
+        font-weight: 700;
+        height: 35%;
+        width: 80%;
+        font-size: 1.2em;
+        text-align: center;
+        border-bottom: 1px solid #E6E4E4;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .total button {
+        margin-top: 8%;
+        color: white;
+        font-weight: 700;
+        background-color: #FC8507;
+        height: 22%;
+        width: 63%;
+        border: none;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .modal_wrapper {
+        width: 870px;
+        height: 80%;
+        background-color: #FFFFFF;
+        position: relative;
+        border: 1px solid #E6E4E4;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .modal_wrapper .c_item_wrapper img {
+        width: 100px;
+        margin-left: 2vw;
+        height: 100px;
+        background-color: gray;
+        background-size: 100% 100%;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .modal_wrapper .c_item_wrapper .p_block {
+        width: 70%;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .modal_wrapper .c_item_wrapper .p_block .p_name {
+        margin-left: 2vw;
+        font-size: 1.2em;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .modal_wrapper .c_item_wrapper .p_block ul {
+        font-size: 0.8em;
+        margin-bottom: 0.6vh;
+        margin-left: 1vw;
+    }
+
+    .modal_main_wrapper .total_item_wrapper .modal_wrapper .c_item_wrapper .p_block .delete_object {
+        font-weight: 700;
+        font-size: 0.8em;
+        margin-left: 3vw;
+        cursor: pointer;
+        color: #4A75CF;
+    }
+
+    .modal_main_wrapper h1 {
+        margin-top: 2vh;
+        width: 100%;
+        border-bottom: 1px solid #E6E4E4;
+        font-size: 1.2em;
+    }
+
+    .modal_main_wrapper h1 span {
+        margin-left: 1vw;
+    }
+
+    .modal_main_wrapper .close {
+        right: 4%;
+        top: 4%;
+        position: absolute;
+        color: black;
+        font-weight: 800;
+        font-size: 2em;
+    }
+
+    .modal_main_wrapper .close:hover {
+        cursor: pointer;
+    }
+
+    .modal_main_wrapper h2 {
+        width: 1180px;
+        margin-top: 3vh;
+        font-size: 1.2em;
+    }
+
+    .modal_main_wrapper form {
+        width: 870px;
+        background-color: #FFFFFF;
+        margin-left: -16.5vw;
+        border: 1px solid #E6E4E4;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .modal_main_wrapper form .input_block {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .modal_main_wrapper form .input_block h3 {
+        width: 13vw;
+        margin-left: 1vw;
+        margin-top: 1vh;
+        margin-bottom: 1vh;
+        font-size: 1em;
+    }
+
+    .modal_main_wrapper form .input_block input {
+        border: 1px solid #E6E4E4;
+        height: 4vh;
+        width: 72%;
+        font-size: 2vh;
+    }
+
+    .modal_main_wrapper form .input_block select {
+        border: 1px solid #E6E4E4;
+        height: 4vh;
+        width: 72%;
+        font-size: 2vh;
+    }
+
+    .modal_main_wrapper form .input_block textarea {
+        border: 1px solid #E6E4E4;
+        height: 12vh;
+        width: 72%;
+        font-size: 2vh;
+    }
+
+
+</style>
+</html>

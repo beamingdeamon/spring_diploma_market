@@ -2,10 +2,387 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Category</title>
 </head>
 <body>
-    category
-    <a href="/">link</a>
+<header class="header_wrapper">
+    <div class="header_main_header">
+        <div class="link_wrapper">
+            <span class="city"><img th:src="@{/images/location.svg}"/> Алматы</span>
+            <span class="header_phone"><img th:src="@{/images/phone.svg}"> +7 (777) 777 77 77</span>
+            <span class="header_mobile"><img th:src="@{/images/mobile.svg}"> +7 777 777 77 77</span>
+        </div>
+
+    </div>
+    <div class="categories_wrapper">
+        <div class="second_wrapper">
+            <div class="all" id="all_categories" >
+                <img th:src="@{/images/menu.svg}">
+                <span>Все категории</span>
+                <img th:src="@{/images/chevron-down.svg}" class="down">
+                <div class="all_categories" id="all_categories_items">
+                    <div th:each="category : ${categories}" class="category_item">
+                        <div class="category_item_second">
+                            <a th:href="@{'/category/' + ${category.id}}" th:text="${category.name}"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="categories">
+                <div class="one_category" >
+                    <div class="category_item_second" th:each="category : ${categories}">
+                        <a th:href="@{'/category/' + ${category.id}}" th:text="${category.name}"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="cart" id="cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
+                    <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+                </svg>
+                <div class="products_number">
+                    <script>
+                        document.getElementById("cart").addEventListener("click", (e)=>{
+                            window.location.replace("/cart");
+                        })
+
+                        if(JSON.parse(localStorage.getItem("cart")) != null){
+                            document.write(JSON.parse(localStorage.getItem("cart")).length);
+                        }else {
+                            document.write("0")
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<div class="wrapper_with_header">
+    <div class="main_wrapper">
+
+        <div class="wrapper">
+            <div class="path">
+                <a href="/">Главная</a> > <span th:text="${category_name}"></span>
+            </div>
+            <h2 th:text="${category_name}"></h2>
+
+            <div th:each="product : ${products}">
+                <div class="product_main_wrapper" th:if="${product.category_id == category_id}">
+                    <div class="product_wrapper">
+                        <img th:src="${product.image_url}">
+                        <div class="right_wrapper">
+                            <h1 th:text="${product.name}"></h1>
+                            <ul>
+                                <li th:text="${product.description}"></li>
+                            </ul>
+                            <div class="right_block">
+                                <h2>Ценна<span th:text="@{${product.price} + ' ₸'}"></span></h2>
+                                <button th:onclick="addToCard([[${product}]])">Добавить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<script>
+    let all_categories_block = document.getElementById("all_categories")
+    all_categories_block.addEventListener("mouseover", (e) => {
+        document.getElementById("all_categories_items").style.visibility = "visible"
+    })
+
+    all_categories_block.addEventListener("mouseleave", (e) => {
+        document.getElementById("all_categories_items").style.visibility = "hidden"
+    })
+
+
+    function addToCard(product) {
+        if (!localStorage.getItem("cart")) {
+            localStorage.setItem("cart", JSON.stringify([]));
+        }
+        const cartItems = JSON.parse(localStorage.getItem("cart"));
+        Object.assign(product, {image: product.image_url});
+        cartItems.push(product);
+        localStorage.setItem("cart", JSON.stringify(cartItems));
+        window.location.reload(true);
+    }
+</script>
 </body>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz@8..144&display=swap');
+
+    body{
+        margin:0;
+        overflow-x: hidden;
+    }
+    .category_item_second{
+        display: flex;
+        align-items: center;
+    }
+    .category_item_second a{
+        margin-left: 1.5vw;
+        text-decoration: none;
+        color: black;
+        color: #4A75CF;
+        font-size: 0.9em;
+    }
+
+    .category_item_second a:active{
+        text-decoration: none;
+        color: black;
+        color: #4A75CF;
+    }
+    .header_wrapper {
+        width: 100vw;
+        height: 95px;
+        font-family: 'Roboto Flex', sans-serif;
+        z-index: 10000;
+    }
+
+    .header_wrapper .header_main_header {
+        width: 100vw;
+        height: 35px;
+        border-bottom: 1px solid grey;
+        background-color: #2B51A1;
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper {
+        width: 1180px;
+        height: 35px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        color: white;
+        font-size: 0.8em;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper .city {
+        font-size: 0.8em;
+        width: 8vw;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper .header_mobile {
+        font-size: 0.8em;
+        margin-left: 2vw;
+    }
+
+    .header_wrapper .header_main_header .link_wrapper .header_phone {
+        font-size: 0.8em;
+        margin-left: 64%;
+    }
+
+    .header_wrapper .categories_wrapper {
+        width: 100vw;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid grey;
+        background-color: #FFFFFF;
+    }
+
+    .header_wrapper .categories_wrapper .cart {
+        width: 2.8vw;
+        height: 5vh;
+        margin-left: 8vw;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #cacaca;
+        border-radius: 50%;
+        position: relative;
+        z-index: 1;
+        cursor: pointer;
+    }
+
+    .header_wrapper .categories_wrapper .cart .products_number {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        text-align: center;
+        top: 60%;
+        left: -18%;
+        font-size: 12px;
+        color: white;
+        background-color: #2B51A1;
+        border-radius: 50%;
+        padding: 0.5vh;
+        z-index: 100;
+    }
+
+    .header_wrapper .categories_wrapper .categories {
+        width: 770px;
+        height: 100%;
+        display: flex;
+        color: #4A75CF;
+    }
+
+    .header_wrapper .categories_wrapper .categories .one_category {
+        padding-left: 2vw;
+        padding-right: 2vw;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper {
+        width: 1180px;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all {
+        color: #4A75CF;
+        cursor: pointer;
+        border-right: 1px solid #E6E4E4;
+        height: 100%;
+        width: 170px;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all span {
+        font-size: 0.9em;
+        margin-left: 0.5vw;
+        padding-right: 0.4vw;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all .all_categories {
+        visibility: hidden;
+        position: absolute;
+        left: 0%;
+        top: 100%;
+        width: 170px;
+        border-left: 1px solid black;
+        border-right: 1px solid black;
+        border-bottom: 1px solid black;
+        background-color: #FFFFFF;
+    }
+
+    .header_wrapper .categories_wrapper .second_wrapper .all .all_categories .category_item {
+        height: 5vh !important;
+        border-top: 1px solid gray !important;
+        display: flex;
+        align-items: center;
+    }
+    .main_wrapper {
+        width: 100vw;
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .main_wrapper .wrapper {
+        margin-top: 2vh;
+        width: 870px;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main_wrapper .wrapper .path {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .main_wrapper .wrapper .path a {
+        text-decoration: none;
+        color: black;
+        padding-right: 1vw;
+    }
+
+    .main_wrapper .wrapper .path a:hover {
+        text-decoration: underline;
+    }
+
+    .main_wrapper .wrapper .path a:active {
+        color: black;
+    }
+
+    .main_wrapper .wrapper .path span {
+        padding-left: 1vw;
+    }
+    .product_main_wrapper {
+        width: 100%;
+        height: 37vh;
+        border: 1px solid #E6E4E4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        margin-top: 2vh;
+        margin-bottom: 2vh;
+        background-color: #FFFFFF;
+    }
+
+    .product_main_wrapper .product_wrapper {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .product_main_wrapper .product_wrapper img {
+        margin-left: 1.8vw;
+        margin-top: 2vh;
+        width: 200px;
+        height: 200px;
+        background-color: gray;
+        background-size: 100% 100%;
+    }
+
+    .product_main_wrapper .product_wrapper .right_wrapper {
+        margin-left: 2vw;
+        width: 47%;
+    }
+
+    .product_main_wrapper .product_wrapper .right_wrapper h1 {
+        font-size: 1.3em;
+        margin-top: 2vh;
+        border-bottom: 1px solid #E6E4E4;
+        padding-bottom: 1.5vh;
+    }
+
+    .product_main_wrapper .product_wrapper .right_wrapper .right_block {
+        right: 3%;
+        position: absolute;
+    }
+
+    .product_main_wrapper .product_wrapper .right_wrapper .right_block button {
+        font-size: 1em;
+        color: white;
+        background-color: #FC911F;
+        border: none;
+        padding-top: 0.8vh;
+        padding-bottom: 0.8vh;
+        padding-left: 1vw;
+        padding-right: 1vw;
+        cursor: pointer;
+    }
+
+    .product_main_wrapper .product_wrapper .right_wrapper .right_block h2 {
+        font-size: 1.1em;
+        font-weight: 700;
+        margin-top: -7vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .product_main_wrapper .product_wrapper .right_wrapper .right_block h2 span {
+        font-weight: 700;
+    }
+
+</style>
 </html>
